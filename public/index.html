@@ -60,7 +60,10 @@
 		}
 
 		var data = [];
-		data.appendAll = xs => xs.filter(x => data.filter(y => x.timestamp == y.timestamp)).forEach(x => data.push(x));
+		data.appendAll = xs => {
+			xs.filter(x => data.filter(y => x.timestamp == y.timestamp)).forEach(x => data.push(x));
+			data.sort((x, y) => y.timestamp - x.timestamp);
+		};
 
 		data.update = (callback, limit=2) => {
 			get('/api/temphumid?limit=' + limit, res => {
@@ -83,18 +86,20 @@
 
 			const gd = data.slice(Math.max(0, data.length - 3*12));
 
+			var elm = document.querySelector('#current_temp .graph');
 			d3.select('#current_temp .graph')
 				.append('path')
 				.attr('d', d3.line()
-					.x(d => (d.timestamp - gd[0].timestamp) * document.querySelector('#current_temp .graph').clientWidth / (gd[gd.length - 1].timestamp - gd[0].timestamp))
-					.y(d => d.temp)
+					.x(d => (d.timestamp - gd[0].timestamp) * elm.clientWidth / (gd[gd.length - 1].timestamp - gd[0].timestamp))
+					.y(d => elm.clientHeight - d.temp * elm.clientHeight / 40)
 					.curve(d3.curveCardinal)(gd));
 
+			var elm = document.querySelector('#current_humid .graph');
 			d3.select('#current_humid .graph')
 				.append('path')
 				.attr('d', d3.line()
 					.x(d => (d.timestamp - gd[0].timestamp) * document.querySelector('#current_humid .graph').clientWidth / (gd[gd.length - 1].timestamp - gd[0].timestamp))
-					.y(d => d.humid)
+					.y(d => elm.clientHeight - d.humid * elm.clientHeight)
 					.curve(d3.curveCardinal)(gd));
 		}
 
