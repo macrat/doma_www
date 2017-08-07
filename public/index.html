@@ -52,9 +52,7 @@
 		function get(endpoint, func) {
 			var xhr = new XMLHttpRequest();
 			xhr.onreadystatechange = () => {
-				if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
-					func(xhr.response);
-				}
+				if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) func(xhr.response);
 			};
 			xhr.open('GET', `http://${location.host}${endpoint}`);
 			xhr.responseType = 'json';
@@ -83,7 +81,7 @@
 				x.height = x.clientHeight;
 			});
 
-			var gd = data.slice(Math.max(0, data.length - 3*12));
+			const gd = data.slice(Math.max(0, data.length - 3*12));
 
 			d3.select('#current_temp .graph')
 				.append('path')
@@ -102,7 +100,7 @@
 
 		function update() {
 			data.update(() => {
-				var last = data[data.length - 1];
+				const last = data[data.length - 1];
 				document.querySelector('#current_temp span').innerText = last.temp.toFixed(1);
 				document.querySelector('#current_humid span').innerText = (last.humid * 100).toFixed(0);
 
