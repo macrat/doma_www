@@ -10,6 +10,7 @@
 				flex-wrap: wrap;
 			}
 			.card {
+				position: relative;
 				display: flex;
 				align-items: center;
 				justify-content: center;
@@ -19,12 +20,32 @@
 				font-size: 200%;
 				box-shadow: 3px 3px 3px gray;
 			}
+			.graph {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+			}
+			.graph path {
+				stroke: gray;
+				stroke-width: 2;
+				fill: none;
+			}
 		</style>
+
+		<script src="https://d3js.org/d3.v4.min.js"></script>
 	</head>
 
 	<body>
-		<div class="card" id=current_temp><div><span></span>℃</div></div>
-		<div class="card" id=current_humid><div><span></span>%</div></div>
+		<div class="card" id=current_temp>
+			<div><span></span>℃</div>
+			<svg class="graph"></svg>
+		</div>
+		<div class="card" id=current_humid>
+			<div><span></span>%</div>
+			<svg class="graph"></svg>
+		</div>
 	</body>
 
 	<script>
@@ -43,8 +64,8 @@
 		var data = [];
 		data.appendAll = xs => xs.filter(x => data.filter(y => x.timestamp == y.timestamp)).forEach(x => data.push(x));
 
-		data.update = callback => {
-			get('/api/temphumid', res => {
+		data.update = (callback, limit=2) => {
+			get('/api/temphumid?limit=' + limit, res => {
 				if (res.error) {
 					alert(res.error);
 					return;
@@ -55,15 +76,45 @@
 			});
 		};
 
+		function graphUpdate() {
+			document.querySelectorAll('.graph').forEach(x => {
+				x.innerHTML = '';
+				x.width = x.clientWidth;
+				x.height = x.clientHeight;
+			});
+
+			var gd = data.slice(Math.max(0, data.length - 3*12));
+
+			d3.select('#current_temp .graph')
+				.append('path')
+				.attr('d', d3.line()
+					.x(d => (d.timestamp - gd[0].timestamp) * document.querySelector('#current_temp .graph').clientWidth / (gd[gd.length - 1].timestamp - gd[0].timestamp))
+					.y(d => d.temp)
+					.curve(d3.curveCardinal)(gd));
+
+			d3.select('#current_humid .graph')
+				.append('path')
+				.attr('d', d3.line()
+					.x(d => (d.timestamp - gd[0].timestamp) * document.querySelector('#current_humid .graph').clientWidth / (gd[gd.length - 1].timestamp - gd[0].timestamp))
+					.y(d => d.humid)
+					.curve(d3.curveCardinal)(gd));
+		}
+
 		function update() {
 			data.update(() => {
 				var last = data[data.length - 1];
 				document.querySelector('#current_temp span').innerText = last.temp.toFixed(1);
 				document.querySelector('#current_humid span').innerText = (last.humid * 100).toFixed(0);
+
+				graphUpdate();
 			});
 		}
 
+		window.addEventListener('resize', graphUpdate);
+
 		update();
 		setInterval(update, 5 * 60 * 1000);
+
+		data.update(graphUpdate, 3*12);
 	</script>
 </html>
