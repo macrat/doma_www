@@ -11,6 +11,7 @@
 			}
 
 			.frame {
+				position: relative;
 				display: flex;
 				flex-wrap: wrap;
 				padding: 1rem;
@@ -20,6 +21,13 @@
 				position: absolute;
 				color: lightgray;
 				font-size: 600%;
+				z-index: -1;
+			}
+			.frame-footer {
+				position: absolute;
+				right: 0;
+				bottom: 0;
+				color: gray;
 				z-index: -1;
 			}
 
@@ -64,6 +72,7 @@
 				<div><span></span>%</div>
 				<svg class="graph"></svg>
 			</div>
+			<span class="frame-footer">最終更新: <span id=last_updated></span></span>
 		</div>
 	</body>
 
@@ -83,6 +92,8 @@
 			xs.filter(x => data.filter(y => x.timestamp == y.timestamp)).forEach(x => data.push(x));
 			data.sort((x, y) => x.timestamp - y.timestamp);
 		};
+
+		data.last = () => data[data.length - 1];
 
 		data.update = (callback, limit=2) => {
 			get('/api/temphumid?limit=' + limit, res => {
@@ -122,13 +133,23 @@
 					.curve(d3.curveCardinal)(gd));
 		}
 
+		function lastUpdatedUpdate() {
+			if (new Date().getTime()/1000 - data.last().timestamp > 60*60) {
+				const last_updated = new Date(data.last().timestamp * 1000);
+				document.querySelector('#last_updated').innerText = last_updated.toLocaleDateString() + ' ' + last_updated.toLocaleTimeString();
+			} else {
+				document.querySelector('#last_updated').innerText = ((new Date().getTime() - data.last().timestamp) / 1000 / 60).toFixed(0) + '分前';
+			}
+		}
+
 		function update() {
 			data.update(() => {
-				const last = data[data.length - 1];
-				document.querySelector('#current_temp span').innerText = last.temp.toFixed(1);
-				document.querySelector('#current_humid span').innerText = (last.humid * 100).toFixed(0);
+				document.querySelector('#current_temp span').innerText = data.last().temp.toFixed(1);
+				document.querySelector('#current_humid span').innerText = (data.last().humid * 100).toFixed(0);
 
 				graphUpdate();
+
+				lastUpdatedUpdate();
 			});
 		}
 
@@ -136,6 +157,8 @@
 
 		update();
 		setInterval(update, 5 * 60 * 1000);
+
+		setInterval(lastUpdatedUpdate, 60 * 1000);
 
 		data.update(graphUpdate, 12*12);
 	</script>
