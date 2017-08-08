@@ -121,7 +121,7 @@
 		};
 
 		function calcDiscomfortIndex(value) {
-			return 0.81 * value.temp + 0.01 * value.humid * (0.99 * value.temp - 14.3) + 46.3;
+			return 0.81 * value.temp + value.humid * (0.99 * value.temp - 14.3) + 46.3;
 		}
 
 		function graphUpdate() {
