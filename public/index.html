@@ -84,7 +84,7 @@
 				x.height = x.clientHeight;
 			});
 
-			const gd = data.slice(Math.max(0, data.length - 3*12));
+			const gd = data.slice(Math.max(0, data.length - 12*12));
 
 			var elm = document.querySelector('#current_temp .graph');
 			d3.select('#current_temp .graph')
@@ -118,6 +118,6 @@
 		update();
 		setInterval(update, 5 * 60 * 1000);
 
-		data.update(graphUpdate, 3*12);
+		data.update(graphUpdate, 12*12);
 	</script>
 </html>

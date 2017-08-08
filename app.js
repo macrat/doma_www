@@ -12,7 +12,7 @@ const db = new sqlite3.Database(DATABASE);
 app.get('/', (req, res) => res.sendFile(__dirname + '/public/index.html'));
 
 app.get('/api/temphumid', (req, res) => {
-	var limit = Math.min(3*12, req.query.limit || 12);
+	var limit = Math.min(12*12, req.query.limit || 12);
 
 	db.all('SELECT timestamp, temperature AS temp, humidity AS humid FROM temphumid ORDER BY timestamp DESC LIMIT ?', limit, (err, rows) => {
 		if (err) throw err;
