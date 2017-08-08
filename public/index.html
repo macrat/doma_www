@@ -2,13 +2,27 @@
 
 <html>
 	<head>
-		<title>test</title>
+		<title>doma</title>
 
 		<style>
 			body {
 				display: flex;
 				flex-wrap: wrap;
 			}
+
+			.frame {
+				display: flex;
+				flex-wrap: wrap;
+				padding: 1rem;
+				box-shadow: 3px 3px 3px gray inset;
+			}
+			.frame-title {
+				position: absolute;
+				color: lightgray;
+				font-size: 600%;
+				z-index: -1;
+			}
+
 			.card {
 				position: relative;
 				display: flex;
@@ -18,7 +32,9 @@
 				width: 20rem;
 				height: 10rem;
 				font-size: 200%;
+				background-color: rgba(255, 255, 255, 0.7);
 				box-shadow: 3px 3px 3px gray;
+				z-index: 1;
 			}
 			.graph {
 				position: absolute;
@@ -38,13 +54,16 @@
 	</head>
 
 	<body>
-		<div class="card" id=current_temp>
-			<div><span></span>℃</div>
-			<svg class="graph"></svg>
-		</div>
-		<div class="card" id=current_humid>
-			<div><span></span>%</div>
-			<svg class="graph"></svg>
+		<div class="frame">
+			<span class="frame-title">3階</span>
+			<div class="card" id=current_temp>
+				<div><span></span>℃</div>
+				<svg class="graph"></svg>
+			</div>
+			<div class="card" id=current_humid>
+				<div><span></span>%</div>
+				<svg class="graph"></svg>
+			</div>
 		</div>
 	</body>
 
