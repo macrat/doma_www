@@ -62,7 +62,7 @@
 		var data = [];
 		data.appendAll = xs => {
 			xs.filter(x => data.filter(y => x.timestamp == y.timestamp)).forEach(x => data.push(x));
-			data.sort((x, y) => y.timestamp - x.timestamp);
+			data.sort((x, y) => x.timestamp - y.timestamp);
 		};
 
 		data.update = (callback, limit=2) => {
