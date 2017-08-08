@@ -163,7 +163,7 @@
 				const last_updated = new Date(data.last().timestamp * 1000);
 				document.querySelector('#last_updated').innerText = last_updated.toLocaleDateString() + ' ' + last_updated.toLocaleTimeString();
 			} else {
-				document.querySelector('#last_updated').innerText = ((new Date().getTime() - data.last().timestamp) / 1000 / 60).toFixed(0) + '分前';
+				document.querySelector('#last_updated').innerText = Math.max(0, (new Date().getTime()/1000 - data.last().timestamp) / 60).toFixed(0) + '分前';
 			}
 		}
 
