@@ -44,6 +44,12 @@
 				box-shadow: 3px 3px 3px gray;
 				z-index: 1;
 			}
+			.card-label {
+				position: absolute;
+				top: 0;
+				right: 0;
+				color: gainsboro;
+			}
 			.graph {
 				position: absolute;
 				top: 0;
@@ -65,11 +71,13 @@
 		<div class="frame">
 			<span class="frame-title">3階</span>
 			<div class="card" id=current_temp>
-				<div><span></span>℃</div>
+				<span class="card-label">温度</span>
+				<div><span class="value"></span>℃</div>
 				<svg class="graph"></svg>
 			</div>
 			<div class="card" id=current_humid>
-				<div><span></span>%</div>
+				<span class="card-label">湿度</span>
+				<div><span class="value"></span>%</div>
 				<svg class="graph"></svg>
 			</div>
 			<span class="frame-footer">最終更新: <span id=last_updated></span></span>
@@ -144,8 +152,8 @@
 
 		function update() {
 			data.update(() => {
-				document.querySelector('#current_temp span').innerText = data.last().temp.toFixed(1);
-				document.querySelector('#current_humid span').innerText = (data.last().humid * 100).toFixed(0);
+				document.querySelector('#current_temp span.value').innerText = data.last().temp.toFixed(1);
+				document.querySelector('#current_humid span.value').innerText = (data.last().humid * 100).toFixed(0);
 
 				graphUpdate();
 
