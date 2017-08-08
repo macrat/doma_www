@@ -80,6 +80,11 @@
 				<div><span class="value"></span>%</div>
 				<svg class="graph"></svg>
 			</div>
+			<div class="card" id=current_discomfort>
+				<span class="card-label">不快指数</span>
+				<div><span class="value"></span></div>
+				<svg class="graph"></svg>
+			</div>
 			<span class="frame-footer">最終更新: <span id=last_updated></span></span>
 		</div>
 	</body>
@@ -115,6 +120,10 @@
 			});
 		};
 
+		function calcDiscomfortIndex(value) {
+			return 0.81 * value.temp + 0.01 * value.humid * (0.99 * value.temp - 14.3) + 46.3;
+		}
+
 		function graphUpdate() {
 			document.querySelectorAll('.graph').forEach(x => {
 				x.innerHTML = '';
@@ -139,6 +148,14 @@
 					.x(d => (d.timestamp - gd[0].timestamp) * document.querySelector('#current_humid .graph').clientWidth / (gd[gd.length - 1].timestamp - gd[0].timestamp))
 					.y(d => elm.clientHeight - d.humid * elm.clientHeight)
 					.curve(d3.curveCardinal)(gd));
+
+			var elm = document.querySelector('#current_discomfort .graph');
+			d3.select('#current_discomfort .graph')
+				.append('path')
+				.attr('d', d3.line()
+					.x(d => (d.timestamp - gd[0].timestamp) * document.querySelector('#current_discomfort .graph').clientWidth / (gd[gd.length - 1].timestamp - gd[0].timestamp))
+					.y(d => elm.clientHeight - calcDiscomfortIndex(d) * elm.clientHeight / 100)
+					.curve(d3.curveCardinal)(gd));
 		}
 
 		function lastUpdatedUpdate() {
@@ -154,6 +171,7 @@
 			data.update(() => {
 				document.querySelector('#current_temp span.value').innerText = data.last().temp.toFixed(1);
 				document.querySelector('#current_humid span.value').innerText = (data.last().humid * 100).toFixed(0);
+				document.querySelector('#current_discomfort span.value').innerText = calcDiscomfortIndex(data.last()).toFixed(1);
 
 				graphUpdate();
 
@@ -166,7 +184,7 @@
 		update();
 		setInterval(update, 5 * 60 * 1000);
 
-		setInterval(lastUpdatedUpdate, 60 * 1000);
+		setInterval(lastUpdatedUpdate, 30 * 1000);
 
 		data.update(graphUpdate, 12*12);
 	</script>
